@@ -1,0 +1,37 @@
+# ingress/ingress.yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: app-ingress
+  namespace: app-ns
+  annotations:
+    # Esta anotação aplica a reescrita de URL para a regra da API
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+    
+    # Esta anotação é para o frontend (SPA)
+    nginx.ingress.kubernetes.io/try-files: $uri $uri/ /index.html
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: meu-app.com
+    http:
+      paths:
+      # Regra da API (MAIS ESPECÍFICA, VEM PRIMEIRO )
+      # A ordem aqui é importante. Regras mais específicas devem vir antes.
+      - path: /api(/|$)(.*)
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: backend-service
+            port:
+              number: 5000
+
+      # Regra do Frontend (MENOS ESPECÍFICA, VEM DEPOIS)
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: frontend-service
+            port:
+              number: 80
+

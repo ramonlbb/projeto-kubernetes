@@ -1,0 +1,52 @@
+# backend/deployment.yaml
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-service
+  namespace: app-ns
+spec:
+  selector:
+    app: backend
+  ports:
+    - protocol: TCP
+      port: 5000
+      targetPort: 5000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-deployment
+  namespace: app-ns
+spec:
+  replicas: 2 # Requisito de alta disponibilidade
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+        - name: backend-container
+          image: ramonlbb/meu-backend:latest
+          ports:
+            - containerPort: 5000
+          envFrom:
+            - configMapRef:
+                name: backend-configmap
+          env:
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  # Este secret deve existir no namespace 'app-ns'
+                  name: postgres-secret
+                  key: POSTGRES_USER
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  # Este secret deve existir no namespace 'app-ns'
+                  name: postgres-secret
+                  key: POSTGRES_PASSWORD
+

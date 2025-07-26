@@ -1,0 +1,13 @@
+# backend/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: backend-configmap
+  namespace: app-ns # No namespace da aplicação
+data:
+  DB_HOST: "postgres-service.db-ns.svc.cluster.local" # DNS interno do K8s
+  DB_PORT: "5432"
+  DB_NAME: "mensagensdb" # Deve ser o mesmo valor do secret do DB
+  API_HOST: "0.0.0.0"
+  API_PORT: "5000"
+

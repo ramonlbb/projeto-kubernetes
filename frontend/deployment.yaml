@@ -1,0 +1,46 @@
+# frontend/deployment.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: frontend-configmap
+  namespace: app-ns
+data:
+  VITE_API_URL: "/api"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend-service
+  namespace: app-ns
+spec: # <-- Nível 1 (sem espaço)
+  selector: # <-- Nível 2 (2 espaços)
+    app: frontend
+  ports: # <-- Nível 2 (2 espaços)
+    - protocol: TCP # <-- Nível 3 (4 espaços, dentro de uma lista)
+      port: 80
+      targetPort: 80
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend-deployment
+  namespace: app-ns
+spec: # <-- Nível 1 (sem espaço)
+  replicas: 2
+  selector: # <-- Nível 2 (2 espaços)
+    matchLabels:
+      app: frontend
+  template: # <-- Nível 2 (2 espaços)
+    metadata:
+      labels:
+        app: frontend
+    spec: # <-- Nível 3 (4 espaços)
+      containers: # <-- Nível 4 (6 espaços)
+        - name: frontend-container
+          image: ramonlbb/meu-frontend:latest
+          ports:
+            - containerPort: 80
+          envFrom:
+            - configMapRef:
+                name: frontend-configmap
+

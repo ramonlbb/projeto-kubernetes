@@ -1,0 +1,13 @@
+# database/pvc.yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-pvc
+  namespace: db-ns
+spec:
+  accessModes:
+    - ReadWriteOnce # Apenas um nó pode montar este volume para escrita
+  resources:
+    requests:
+      storage: 1Gi # Solicitando 1 Gigabyte de espaço
+
